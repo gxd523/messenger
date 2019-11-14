@@ -14,6 +14,8 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 
+import com.demo.messenger.server.MsgData;
+
 public class MainActivity extends Activity {
     private Messenger serverMessenger;
     private Messenger clientMessenger;
@@ -39,9 +41,12 @@ public class MainActivity extends Activity {
     public void onBtnClick(View view) {
         if (serverMessenger != null) {
             Message msg = Message.obtain();
-            msg.arg1 = 9527;
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("client", new MsgData("一条来自客户端的消息"));
+            msg.setData(bundle);
             msg.replyTo = clientMessenger;
             try {
+                Log.d("gxd", "客户端发送了消息-->");
                 serverMessenger.send(msg);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -68,7 +73,10 @@ public class MainActivity extends Activity {
     private static class ClientMessengerHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            Log.d("gxd", "ClientMessengerHandler.handleMessage-->" + msg.arg1);
+            Bundle bundle = msg.getData();
+            bundle.setClassLoader(Thread.currentThread().getContextClassLoader());
+            MsgData msgData = bundle.getParcelable("server");
+            Log.d("gxd", "客户端收到了消息-->" + msgData);
         }
     }
 }

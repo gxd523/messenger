@@ -2,6 +2,7 @@ package com.demo.messenger.server;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -23,12 +24,23 @@ public class MessengerService extends Service {
     private static class ServerMessengerHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            Log.d("gxd", "ServerMessengerHandler.handleMessage-->" + msg.arg1);
+            Bundle bundle = msg.getData();
+            bundle.setClassLoader(Thread.currentThread().getContextClassLoader());
+            MsgData msgData = bundle.getParcelable("client");
+            Log.d("gxd", "服务端收到了消息-->" + msgData);
+
             Messenger clientMessenger = msg.replyTo;
-            Message msgToClient = Message.obtain();
-            msgToClient.arg1 = msg.arg1 * 2;
+            replyMsg(clientMessenger);
+        }
+
+        private void replyMsg(Messenger messenger) {
+            Message msg = Message.obtain();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("server", new MsgData("一条来自服务端的消息"));
+            msg.setData(bundle);
             try {
-                clientMessenger.send(msgToClient);
+                messenger.send(msg);
+                Log.d("gxd", "服务端回复了消息-->");
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
