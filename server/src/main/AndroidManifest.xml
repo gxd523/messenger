@@ -1,0 +1,14 @@
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.demo.messenger.server">
+
+    <application
+        android:label="messenger-server"
+        tools:ignore="GoogleAppIndexingWarning">
+        <service
+            android:name=".MessengerService"
+            android:enabled="true"
+            android:exported="true" />
+    </application>
+</manifest>
